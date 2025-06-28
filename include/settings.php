@@ -8,5 +8,5 @@
 	/* ---- */
 	$arxs_api_key = "";
 	$arxs_token_url = "https://identity.arxs.be/api/authenticate/token/";
-	$arxs_baseUrl = "http://api.arxs.be";
+	$arxs_baseUrl = "https://api.arxs.be";
 ?>
