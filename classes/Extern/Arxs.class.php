@@ -73,9 +73,6 @@
 		
 		private function postToApi(string $path, $body)
 		{
-			echo ("1<br>\n");
-			
-			
 			// Vraag
 			$url = $this->base_url . $path;
 			$options = [
@@ -87,21 +84,11 @@
 				]
 			];
 			
-			echo ("2<br>\n");
-			echo ("{$url}<br>\n");
-			echo ("<pre>\n");
-			print_r ($options);
-			echo ("</pre>\n");
-			echo ("2b<br>\n");
-
 			// Antwoord
 			$context = stream_context_create($options);
+			
 			$response = file_get_contents($url, false, $context);
 			
-			echo ("3<br>\n");
-			echo ("{$context}<br>\n");
-			echo ("{$response}<br>\n");
-
 			// Controle
 			if ($response === false)
 			{
@@ -117,6 +104,7 @@
 			// Gegevens ophalen en binnen het object bewaren
 			$this->data['legalStructure'] = $this->fetchFromApi("/api/masterdata/legalstructure");
 			$this->data['branch'] = $this->fetchFromApi("/api/masterdata/branch");
+			$this->data['codeElement'] = $this->fetchFromApi("/api/masterdata/codeelements");
 		}
 		
 		public function getMasterdata() : array
@@ -127,9 +115,9 @@
 			// Antwoord sturen
 			return [
 				'legalStructure' => $this->data['legalStructure'],
-				'branch' => $this->data['branch']
+				'branch' => $this->data['branch'],
+				'codeElement' => $this->data['codeElement']
 			];
-
 		}
 		
 		public function getRoles(string $id = '')
@@ -160,6 +148,16 @@
 			}
 		}
 		
+		public function newLocation($data)
+		{
+			return $this->postToApi("/api/assetmanagement/location/", $data);
+		}
+		
+		public function updateLocation($data, string $id)
+		{
+			return $this->postToApi("/api/assetmanagement/location/{$id}", $data);
+		}
+		
 		public function getEmployees(string $id = '')
 		{
 			if ($id == '')
@@ -176,22 +174,26 @@
 		
 		public function newEmployee($data)
 		{
-			return $this->postToApi("/api/masterdata/employee", $data);
+			return $this->postToApi("/api/masterdata/employee/", $data);
 		}
 		
+		public function updateEmployee($data, string $id)
+		{
+			return $this->postToApi("/api/masterdata/employee/{$id}", $data);
+		}
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+		public function addUserToRole(string $roleID, array $arrUserIDs)
+		{
+			if (empty($arrUserIDs))
+			{
+				// Zonder userID kan er niets worden gedaan
+				return "Fout: geen ID van een gebruiker meegegeven";
+			}
+			else
+			{
+				// Personeelslid met $userID toevoegen aan de rol met $roleID
+				return $this->postToApi("/api/masterdata/userrole/{$roleID}/addUsers", $arrUserIDs);
+			}
+		}
 	}
 ?>
